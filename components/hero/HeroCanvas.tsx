@@ -10,8 +10,15 @@ export default function HeroCanvas() {
     <section className="relative w-full h-[90vh] bg-white overflow-hidden">
       {/* 3D Scene */}
       <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 2, 5], fov: 45 }}>
-          <ambientLight intensity={0.5} />
+        <Canvas camera={{ position: [0, 2, 5], fov: 45 }} shadows>
+          <ambientLight intensity={0.8} />
+          <spotLight
+            position={[5, 10, 5]}
+            angle={0.4}
+            penumbra={0.5}
+            intensity={2}
+            castShadow
+          />
           <Suspense fallback={null}>
             <PaperPlane />
           </Suspense>
@@ -25,7 +32,7 @@ export default function HeroCanvas() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-5xl md:text-7xl font-bold text-forest tracking-tighter mix-blend-multiply"
+            className="text-5xl md:text-7xl font-extrabold text-forest tracking-[-0.03em] mix-blend-multiply drop-shadow-sm"
           >
             Полиграфия 2.0: <br />
             От идеи до тиража за один диалог
