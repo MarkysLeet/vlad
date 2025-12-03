@@ -19,6 +19,7 @@ export default function ConfiguratorControls() {
         type: store.productType,
         size: `${store.width}x${store.height}`,
         material: store.material,
+        hasGrommets: store.hasGrommets,
         qty: store.quantity,
         price: store.price
     };
@@ -69,7 +70,7 @@ export default function ConfiguratorControls() {
                 min="50" max="500" step="10"
                 value={store.width}
                 onChange={(e) => store.setWidth(Number(e.target.value))}
-                className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-forest range-thumb-lg"
+                className="w-full h-4 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-forest range-thumb-lg shadow-inner"
             />
         </div>
 
@@ -83,7 +84,7 @@ export default function ConfiguratorControls() {
                 min="50" max="300" step="10"
                 value={store.height}
                 onChange={(e) => store.setHeight(Number(e.target.value))}
-                className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-forest range-thumb-lg"
+                className="w-full h-4 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-forest range-thumb-lg shadow-inner"
             />
         </div>
       </div>
@@ -122,6 +123,24 @@ export default function ConfiguratorControls() {
         </div>
       </div>
 
+      {/* Grommets Option - Only for Wide Format */}
+      {store.productType === "wide" && (
+        <div className="flex items-center justify-between py-2 cursor-pointer" onClick={() => store.setHasGrommets(!store.hasGrommets)}>
+            <label className="text-sm uppercase tracking-wider text-forest/60 cursor-pointer select-none">С люверсами</label>
+            <div className={cn(
+                "w-12 h-6 rounded-full p-1 transition-colors duration-300 flex items-center",
+                store.hasGrommets ? "bg-lime shadow-neon" : "bg-gray-200 shadow-inner"
+            )}>
+                <motion.div
+                    layout
+                    className="w-4 h-4 bg-forest rounded-full shadow-sm"
+                    animate={{ x: store.hasGrommets ? 24 : 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+            </div>
+        </div>
+      )}
+
       {/* Quantity */}
       <div className="space-y-4">
          <div className="flex justify-between items-center">
@@ -154,7 +173,7 @@ export default function ConfiguratorControls() {
                 key={store.price} // Re-animate on change
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-5xl font-extrabold text-forest"
+                className="text-5xl font-black text-forest"
             >
                 {store.price.toLocaleString()} ₽
             </motion.span>
@@ -162,7 +181,7 @@ export default function ConfiguratorControls() {
 
         <a 
             href={generateDeepLink()}
-            className="w-full bg-lime text-forest py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-3 shadow-neon transition-all duration-300 transform active:scale-[0.98]"
+            className="w-full bg-gradient-to-b from-lime-400 to-lime-500 text-forest py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-3 shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] shadow-neon transition-all duration-300 transform active:scale-[0.98] hover:shadow-[inset_0_2px_4px_rgba(255,255,255,0.6)]"
         >
             <span>Рассчитать в Telegram</span>
             <Send size={20} />
