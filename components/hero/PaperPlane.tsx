@@ -1,47 +1,55 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { paperVertexShader, paperFragmentShader } from "./shaders";
 
 export default function PaperPlane() {
-  const mesh = useRef<THREE.Mesh>(null);
-  
-  // Uniforms for the shader
-  const uniforms = useMemo(
-    () => ({
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0, 0) },
-      uColorBg: { value: new THREE.Color("#F5F5F7") }, // Paper color
-      uColorAccent: { value: new THREE.Color("#CCFF00") }, // Electric Lime
-    }),
-    []
-  );
+  const meshRef = useRef<THREE.Mesh>(null);
+  const originalPositionsRef = useRef<Float32Array | null>(null);
+
+  useEffect(() => {
+    if (meshRef.current) {
+      const geometry = meshRef.current.geometry;
+      // Store original positions to calculate waves from a stable base
+      originalPositionsRef.current = geometry.attributes.position.array.slice() as Float32Array;
+    }
+  }, []);
 
   useFrame((state) => {
-    if (mesh.current) {
-      const material = mesh.current.material as THREE.ShaderMaterial;
-      material.uniforms.uTime.value = state.clock.getElapsedTime();
-      
-      // Map mouse position to normalized device coordinates (-1 to +1) roughly
-      // In a real app we might want to raycast, but simple mapping works for effect
-      const mouseX = (state.pointer.x * state.viewport.width) / 2;
-      const mouseY = (state.pointer.y * state.viewport.height) / 2;
-      
-      // Smoothly interpolate mouse uniform
-      material.uniforms.uMouse.value.lerp(new THREE.Vector2(mouseX, mouseY), 0.1);
+    if (meshRef.current && originalPositionsRef.current) {
+      const time = state.clock.getElapsedTime();
+      const geometry = meshRef.current.geometry;
+      const positions = geometry.attributes.position.array as Float32Array;
+      const originals = originalPositionsRef.current;
+      const count = geometry.attributes.position.count;
+
+      for (let i = 0; i < count; i++) {
+        const x = originals[i * 3];
+        const y = originals[i * 3 + 1];
+
+        // Replicate the gentle wave effect from the previous shader
+        // elevation = sin(x * 2.0 + t * 0.5) * 0.1 + sin(y * 1.5 + t * 0.3) * 0.1
+        let elevation = Math.sin(x * 2.0 + time * 0.5) * 0.1;
+        elevation += Math.sin(y * 1.5 + time * 0.3) * 0.1;
+
+        // Apply to Z axis
+        positions[i * 3 + 2] = elevation;
+      }
+
+      geometry.attributes.position.needsUpdate = true;
+      geometry.computeVertexNormals();
     }
   });
 
   return (
-    <mesh ref={mesh} rotation={[-Math.PI / 3, 0, 0]} position={[0, -1, 0]}>
+    <mesh ref={meshRef} rotation={[-Math.PI / 3, 0, 0]} position={[0, -1, 0]} receiveShadow castShadow>
       {/* High segment count for smooth wave deformation */}
       <planeGeometry args={[12, 12, 64, 64]} />
-      <shaderMaterial
-        vertexShader={paperVertexShader}
-        fragmentShader={paperFragmentShader}
-        uniforms={uniforms}
+      <meshStandardMaterial
+        color="#ffffff"
+        roughness={0.65}
+        metalness={0.0}
         side={THREE.DoubleSide}
       />
     </mesh>

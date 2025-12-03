@@ -28,7 +28,7 @@ export default function ConfiguratorControls() {
   };
 
   return (
-    <div className="bg-white p-8 md:p-12 rounded-2xl shadow-tactile border border-forest/5 flex flex-col gap-8 h-full">
+    <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-forest/5 flex flex-col gap-8 h-full">
       
       {/* Tabs: Product Type */}
       <div className="flex p-1 bg-gray-100 rounded-lg relative">
@@ -69,7 +69,7 @@ export default function ConfiguratorControls() {
                 min="50" max="500" step="10"
                 value={store.width}
                 onChange={(e) => store.setWidth(Number(e.target.value))}
-                className="w-full accent-forest cursor-pointer"
+                className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-forest range-thumb-lg"
             />
         </div>
 
@@ -83,7 +83,7 @@ export default function ConfiguratorControls() {
                 min="50" max="300" step="10"
                 value={store.height}
                 onChange={(e) => store.setHeight(Number(e.target.value))}
-                className="w-full accent-forest cursor-pointer"
+                className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-forest range-thumb-lg"
             />
         </div>
       </div>
@@ -112,7 +112,10 @@ export default function ConfiguratorControls() {
                 )}
             >
                  {/* Specular gradient imitation */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+                 {/* Static background for glossy feel + hover animation */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/80 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
                 <span className="relative z-10 font-medium text-forest">Глянцевый</span>
                 {store.material === "glossy" && <Check size={16} className="text-lime" />}
             </button>
@@ -146,12 +149,12 @@ export default function ConfiguratorControls() {
       {/* Footer / CTA */}
       <div className="space-y-4 pt-8 border-t border-forest/10">
         <div className="flex justify-between items-end">
-            <span className="text-forest/60">Итого:</span>
+            <span className="text-forest/60 mb-2">Итого:</span>
             <motion.span 
                 key={store.price} // Re-animate on change
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold text-forest"
+                className="text-5xl font-extrabold text-forest"
             >
                 {store.price.toLocaleString()} ₽
             </motion.span>
@@ -159,7 +162,7 @@ export default function ConfiguratorControls() {
 
         <a 
             href={generateDeepLink()}
-            className="w-full bg-lime text-forest py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-3 hover:shadow-neon transition-all duration-300 transform active:scale-[0.98]"
+            className="w-full bg-lime text-forest py-4 rounded-xl font-bold uppercase tracking-wide flex items-center justify-center gap-3 shadow-neon transition-all duration-300 transform active:scale-[0.98]"
         >
             <span>Рассчитать в Telegram</span>
             <Send size={20} />

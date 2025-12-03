@@ -2,7 +2,7 @@
 
 import { useConfigStore } from "@/store/configuratorStore";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stage } from "@react-three/drei";
+import { OrbitControls, Stage, ContactShadows, Environment } from "@react-three/drei";
 import { useRef, useMemo } from "react";
 import * as THREE from "three";
 
@@ -17,8 +17,8 @@ function BannerModel() {
   // Material properties
   const materialProps = useMemo(() => {
     return material === "glossy" 
-        ? { roughness: 0.1, metalness: 0.1, clearcoat: 1.0 }
-        : { roughness: 0.8, metalness: 0.0, clearcoat: 0.0 };
+        ? { roughness: 0.1, metalness: 0.0, envMapIntensity: 1.5 }
+        : { roughness: 0.8, metalness: 0.0, envMapIntensity: 0.5 };
   }, [material]);
 
   // Texture loader could go here if we had textures. 
@@ -26,7 +26,7 @@ function BannerModel() {
 
   return (
     <group>
-        <mesh ref={mesh}>
+        <mesh ref={mesh} castShadow receiveShadow>
             <planeGeometry args={[scaleX, scaleY, 32, 32]} />
             <meshStandardMaterial 
                 color="#ffffff"
@@ -73,8 +73,8 @@ function Grommets({ width, height }: { width: number, height: number }) {
         <group>
             {grommets.map((pos, idx) => (
                 <mesh key={idx} position={new THREE.Vector3(...pos)} rotation={[0,0,0]}>
-                    <torusGeometry args={[0.02, 0.005, 8, 16]} />
-                    <meshStandardMaterial color="#888" metalness={0.8} roughness={0.2} />
+                    <torusGeometry args={[0.02, 0.005, 16, 32]} />
+                    <meshStandardMaterial color="#aaaaaa" metalness={1.0} roughness={0.2} />
                 </mesh>
             ))}
         </group>
@@ -89,9 +89,20 @@ export default function ConfiguratorVisualizer() {
        </div>
        
        <Canvas shadows camera={{ position: [0, 0, 4], fov: 50 }}>
-          <Stage environment="city" intensity={0.5} adjustCamera={false}>
+          <Environment preset="city" />
+          <Stage environment={null} intensity={0.5} adjustCamera={false}>
              <BannerModel />
           </Stage>
+
+          <ContactShadows
+            opacity={0.4}
+            scale={10}
+            blur={2.5}
+            far={10}
+            resolution={256}
+            color="#000000"
+          />
+
           <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.5} />
        </Canvas>
     </div>
